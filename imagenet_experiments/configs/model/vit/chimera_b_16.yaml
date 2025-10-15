@@ -1,0 +1,32 @@
+defaults:
+  - layer: chimerablock
+
+_name_: chimera_b_16
+patch_size: 16
+d_model: 768
+depth: 23
+expand: 0
+norm: layer
+use_pos_embed: false
+use_cls_token: false
+
+layer:
+  qk_dim: 64 # vs 64 for ViT-B
+  headdim: 128 # 768*2/128 = 12 heads vs 12 heads for ViT-B
+  unified_view: False # keep it False for now
+  include_headnodes: "1111"
+
+  debug_use_get_A_dpr: False
+  debug_store_mm: False
+
+  share_BC: False
+  share_BC_for_two_graphs: True
+  share_dt_for_two_graphs: False
+  share_BC_for_two_graphs_mode: "diagonal" # "line" or "diagonal"
+  add_fc_layers: False
+  expand_factor: "2.0"
+  use_fast_inverse: True
+  dt_min_max_factor: 7.0 # [5, 7, 10] - For a shorter sequence length
+  dt_self_min_max_factor: 1.0 # [1, 5] UNUSED 
+  normalization_mode: "dt_original"
+  norm_sqrt_mul_factor: 1.0 # UNUSED

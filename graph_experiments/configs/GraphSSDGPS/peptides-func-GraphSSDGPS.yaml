@@ -1,0 +1,97 @@
+out_dir: results
+metric_best: ap
+wandb:
+  use: True
+  project: chimera-graph
+dataset:
+  format: OGB
+  name: peptides-functional
+  task: graph
+  task_type: classification_multilabel
+  transductive: False
+  node_encoder: True
+  node_encoder_name: Atom #+LapPE
+  node_encoder_bn: False
+  edge_encoder: True
+  edge_encoder_name: Bond
+  edge_encoder_bn: False
+posenc_LapPE:
+  enable: False
+  eigen:
+    laplacian_norm: none
+    eigvec_norm: L2
+    max_freqs: 10
+  model: DeepSet
+  dim_pe: 16
+  layers: 2
+  raw_norm_type: none
+posenc_RWSE:
+  enable: False
+  kernel:
+    times_func: range(1,21)
+  model: Linear
+  dim_pe: 28
+  raw_norm_type: BatchNorm
+train:
+  mode: custom
+  batch_size: 16
+  eval_period: 1
+  ckpt_period: 100
+  batch_accumulation: 1
+model:
+  type: SSDGPSModel
+  loss_fun: cross_entropy
+  graph_pooling: mean
+gt:
+  layer_type: CustomGatedGCN+GraphSSDLayer
+  layers: 8
+  n_heads: 2
+  dim_hidden: 64  # `gt.dim_hidden` must match `gnn.dim_inner`
+  d_inner: 64
+  d_state: 96
+  ffn_d_dinner: 128
+  dropout: 0.1
+  attn_dropout: 0.1
+  layer_norm: False #unused
+  batch_norm: False #unused
+  use_dag_decomposition: False
+  norm_position: pre
+  local_norm_style: layer
+  norm_style: layer
+  extra_normalizer: False
+  is_block_composed: True
+  if_dense_bfs: False
+  num_dags: 4
+  gnn_layernorm: True
+  gnn_residual: True
+  add_conv_layers: False
+  conv_layers: 0
+gssd:
+  layer_args:
+    normalize_L: False #unused
+    normalize_x: False #unused
+    broadcast_bc_in_heads: True
+    norm_constraint: sum_leq
+    combine_type: sum_node_edge #unused
+    use_fast_inverse: False
+    graph_diameter: 200
+    is_edge_dt: True
+gnn:
+  head: mlp_graph
+  layers_pre_mp: 0
+  layers_post_mp: 4
+  dim_inner: 64  # `gt.dim_hidden` must match `gnn.dim_inner`
+  batchnorm: False
+  act: gelu
+  dropout: 0.1
+  agg: mean
+  normalize_adj: False
+optim:
+  clip_grad_norm: True
+  optimizer: adamW
+  weight_decay: 0.0
+  base_lr: 0.001
+  max_epoch: 250
+  scheduler: cosine_with_warmup
+  num_warmup_epochs: 5
+  batch_accumulation: 1
